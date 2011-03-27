@@ -11,22 +11,13 @@ case class Player(name: String, gold: Integer = 0, location: Site) {
 class Enemy {
 }
 
-case class Dragon(location: Location = new Location(0, 0)) {
-}
-
-case class Site(name: String, description: String) {
-  override def toString = description
-}
-
-case class Location(x: Integer, y: Integer) {
-  def move(dx: Integer, dy: Integer) = copy(x = x.intValue + dx.intValue, y = y.intValue + dy.intValue)
-}
+case class Site(name: String, description: String)
 
 object GameMap {
-  val townSquare = Site("Scalata town square", "Town square in Scalata, Scalata, a nice village with elves or equivalent")
+  val townSquare = Site("Scalata town square", "Town square in Scalata, a nice village with elves or equivalent.  Merchants line the streets and a small protest is forming.")
   val jail = Site("Scalata jail", "Jail in Scalata.  This place reeks of justice")
-  val clearing = Site("Clearing by a pond", "Clearing, near a pond with deer grazing nearby.  No sign of snakes, but there is a foreboding and smelly cave nearby")
-  val cave = Site("Cave", "Cavernous cave.  A scorpion runs past you, screaming")
+  val clearing = Site("Clearing by a pond", "Clearing, near a pond with deer grazing nearby.  No sign of snakes, but there is a foreboding and smelly cave nearby.")
+  val cave = Site("Cave", "Cavernous cave.  A scorpion runs past you, screaming.")
   val links = Map(townSquare -> ( clearing :: jail :: Nil ),
                   clearing -> ( townSquare :: Nil ),
                   jail -> ( townSquare :: Nil ),
@@ -49,8 +40,6 @@ class ExitAction extends Action {
 }
 
 case class GameState(player: Player = new Player("Dorbax", 0, GameMap.townSquare)) {
-  val enemies = new Dragon() :: Nil
-
   def update(input: Action) = input.update(this)
 
   def options = {
@@ -62,9 +51,7 @@ case class GameState(player: Player = new Player("Dorbax", 0, GameMap.townSquare
   }
 
   override def toString = {
-    player + ", enemies = " + ( for ( e <- enemies if e.location == player.location ) yield {
-      e
-    } )
+    player.name + ": " + player.gold + " gold\n" + player.location.name + "\n" + player.location.description
   }
 }
 
