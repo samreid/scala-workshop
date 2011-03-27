@@ -1,9 +1,17 @@
-package org.frontierdevelopers.scalaworkshop
+package org.frontierdevelopers.scalaworkshop.swing
 
 import java.awt.{Dimension, Graphics2D}
-import swing._
-import event._
-import event.Key._
+
+import scala.swing.{Component, MainFrame, SimpleSwingApplication}
+import swing.event._
+import swing.event.Key._
+import scala.swing.event.Key.Value
+
+case class Player(x: Int, y: Int)
+
+case class GameState(player: Player) {
+
+}
 
 object SwingGame extends SimpleSwingApplication {
   def top = new MainFrame {

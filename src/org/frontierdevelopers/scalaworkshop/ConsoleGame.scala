@@ -2,8 +2,10 @@ package org.frontierdevelopers.scalaworkshop
 
 import java.lang.Integer
 
-case class Player(gold: Integer = 0, location: Location = Location(0, 0)) {
+case class Player(name: String, gold: Integer = 0, location: Site) {
   val weapons = Nil
+
+  override def toString = name + ", gold=" + gold + ", location = " + location
 }
 
 class Enemy {
@@ -12,51 +14,77 @@ class Enemy {
 case class Dragon(location: Location = new Location(0, 0)) {
 }
 
-case class Site(location: Location, description: String) {
+case class Site(name: String, description: String) {
+  override def toString = description
 }
 
 case class Location(x: Integer, y: Integer) {
   def move(dx: Integer, dy: Integer) = copy(x = x.intValue + dx.intValue, y = y.intValue + dy.intValue)
 }
 
-case class GameState(player: Player = new Player) {
-  val enemies = new Dragon() :: Nil
-  val description = Map(Location(0, 0) -> "29th Street Mall.  All is quiet.")
+object GameMap {
+  val townSquare = Site("Scalata town square", "Town square in Scalata, Scalata, a nice village with elves or equivalent")
+  val jail = Site("Scalata jail", "Jail in Scalata.  This place reeks of justice")
+  val clearing = Site("Clearing by a pond", "Clearing, near a pond with deer grazing nearby.  No sign of snakes, but there is a foreboding and smelly cave nearby")
+  val cave = Site("Cave", "Cavernous cave.  A scorpion runs past you, screaming")
+  val links = Map(townSquare -> ( clearing :: jail :: Nil ),
+                  clearing -> ( townSquare :: Nil ),
+                  jail -> ( townSquare :: Nil ),
+                  clearing -> ( cave :: Nil ),
+                  cave -> ( Nil )
+  )
+}
 
-  def update(input: String) = {
-    input match {
-      case "n" => {
-        println("Moving north.")
-        copy(player = player.copy(location = player.location.move(0, -1)))
-      }
-      case "s" => {
-        println("Moving south.")
-        copy(player = player.copy(location = player.location.move(0, 1)))
-      }
-      case _ => this
-    }
+trait Action {
+  def update(state: GameState): GameState
+}
+
+class ExitAction extends Action {
+  def update(state: GameState) = {
+    System.exit(0)
+    null
   }
 
-  def options = "options: n,s"
+  override def toString = "exit game"
+}
+
+case class GameState(player: Player = new Player("Dorbax", 0, GameMap.townSquare)) {
+  val enemies = new Dragon() :: Nil
+
+  def update(input: Action) = input.update(this)
+
+  def options = {
+    val travelLinks = for ( link <- GameMap.links(player.location) ) yield {
+      TravelTo(link)
+    }
+    val systemOptions = new ExitAction :: Nil
+    travelLinks ::: systemOptions
+  }
 
   override def toString = {
-    val locationDescription = if ( description.contains(player.location) ) {
-      description(player.location)
-    }
-    else {
-      "uncharted location at GPS location: " + player.location
-    }
-    locationDescription + ", enemies = " + ( for ( e <- enemies if e.location == player.location ) yield {
+    player + ", enemies = " + ( for ( e <- enemies if e.location == player.location ) yield {
       e
-    } ) + " gold = " + player.gold
+    } )
   }
+}
+
+case class TravelTo(destination: Site) extends Action {
+  override def toString = "Travel to " + destination.name
+
+  def update(state: GameState) = state.copy(state.player.copy(location = destination))
 }
 
 class ConsoleGame {
   def loopGame(state: GameState): Unit = {
     println(state)
-    println(state.options)
-    loopGame(state.update(readLine()))
+    val options = state.options
+    val numberedOptions = for ( i <- 0 until options.length ) yield {
+      i + ". " + options(i)
+    }
+    println(numberedOptions.mkString("\n"))
+    val line: String = readLine()
+    val choice = Integer.parseInt(line)
+    loopGame(state.update(options(choice)))
   }
 }
 
