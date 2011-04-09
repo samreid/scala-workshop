@@ -16,17 +16,21 @@ trait GameObject {
   def getInventoryDescription: String
 }
 
-case class Site(name: String, description: String, var objects: List[GameObject]) {
+case class Site(name: String, description: String, var objects: List[GameObject] = Nil) {
   def this(name: String, description: String) = this (name, description, Nil)
 }
 
 case class BlueKey extends GameObject {
   def actions() = new Action() {
     def update(state: GameState) = {
-      val updatedJail: Site = state.map.jail.copy(objects = Nil)
-      (state.copy(player = state.player.copy(items = BlueKey.this :: state.player.items,
-                                             location = updatedJail),
-                  map = state.map.copy(jail = updatedJail)), "You pick up the Blue key, dust it off and put it in your pocket")
+      val updatedJail: Site = GameMap.jail.copy(objects = Nil)
+      (
+        state.copy(
+          player = state.player.copy(items = BlueKey.this :: state.player.items, location = updatedJail),
+          map = state.map.update(GameMap.jail, updatedJail)
+        ), 
+        "You pick up the Blue key, dust it off and put it in your pocket"
+      )
     }
 
     override def toString = "Take the key when nobody is looking."
@@ -50,19 +54,44 @@ class ExitAction extends Action {
   override def toString = "exit game"
 }
 
-case class GameMap(jail: Site = new Site("Scalata jail", "Jail in Scalata.  This place reeks of justice", new BlueKey :: Nil)) {
-  val townSquare = new Site("Scalata town square", "Town square in Scalata, a nice village with elves or equivalent.  Merchants line the streets and a small protest is forming.")
-  val clearing = new Site("Clearing by a pond", "Clearing, near a pond with deer grazing nearby.  No sign of snakes, but there is a foreboding and smelly cave nearby.")
-  val cave = new Site("Cave", "Cavernous cave.  A scorpion runs past you, screaming.")
-  val links = Map(townSquare -> ( clearing :: jail :: Nil ),
-                  clearing -> ( townSquare :: cave :: Nil ),
-                  jail -> ( townSquare :: Nil ),
-                  cave -> ( Nil )
+case class GameMap(links: Map[Site, List[Site]]) {
+  def update(old: Site, newsite: Site ): GameMap = GameMap(
+    links.foldLeft(Map.empty[Site, List[Site]]) {
+      case (m, (from, to)) => m + ((if (from == old) newsite else old) -> to.map(t => if (t == old) newsite else old))
+    }
   )
 }
 
+object GameMap {
+  val jail = Site("Scalata jail", "Jail in Scalata.  This place reeks of justice", new BlueKey :: Nil)
+  val townSquare = Site("Scalata town square", "Town square in Scalata, a nice village with elves or equivalent.  Merchants line the streets and a small protest is forming.")
+  val clearing = Site("Clearing by a pond", "Clearing, near a pond with deer grazing nearby.  No sign of snakes, but there is a foreboding and smelly cave nearby.")
+  val cave = Site("Cave", "Cavernous cave.  A scorpion runs past you, screaming.")
+
+  val initialMap = GameMap(
+    Map(
+      townSquare -> ( clearing :: jail :: Nil ),
+      clearing -> ( townSquare :: cave :: Nil ),
+      jail -> ( townSquare :: Nil ),
+      cave -> ( clearing :: Nil )
+    )
+  )
+}
+
+
+//case class GameMap(jail: Site = new Site("Scalata jail", "Jail in Scalata.  This place reeks of justice", new BlueKey :: Nil)) {
+//  val townSquare = new Site("Scalata town square", "Town square in Scalata, a nice village with elves or equivalent.  Merchants line the streets and a small protest is forming.")
+//  val clearing = new Site("Clearing by a pond", "Clearing, near a pond with deer grazing nearby.  No sign of snakes, but there is a foreboding and smelly cave nearby.")
+//  val cave = new Site("Cave", "Cavernous cave.  A scorpion runs past you, screaming.")
+//  val links = Map(townSquare -> ( clearing :: jail :: Nil ),
+//                  clearing -> ( townSquare :: cave :: Nil ),
+//                  jail -> ( townSquare :: Nil ),
+//                  cave -> ( Nil )
+//  )
+//}
+
 case class GameState(map: GameMap, player: Player) {
-  def this(map: GameMap) = this (map, new Player("Dorbax", 0, map.townSquare, Nil))
+  def this(map: GameMap) = this (map, new Player("Dorbax", 0, GameMap.townSquare, Nil))
 
 
   def update(input: Action) = input.update(this)
@@ -110,6 +139,6 @@ class ConsoleGame {
 
 object ConsoleGame {
   def main(args: Array[String]) {
-    new ConsoleGame().loopGame(new GameState(new GameMap))
+    new ConsoleGame().loopGame(new GameState(GameMap.initialMap))
   }
 }
