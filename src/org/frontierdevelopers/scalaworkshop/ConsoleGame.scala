@@ -9,7 +9,7 @@ case class Player(name: String, gold: Integer, location: Site, items: List[GameO
 }
 
 trait GameObject {
-  def getActions: List[Action]
+  def actions: List[Action]
 
   def getSiteDescription: String
 
@@ -21,12 +21,12 @@ case class Site(name: String, description: String, var objects: List[GameObject]
 }
 
 case class BlueKey extends GameObject {
-  def getActions() = new Action() {
+  def actions() = new Action() {
     def update(state: GameState) = {
       val updatedJail: Site = state.map.jail.copy(objects = Nil)
-      state.copy(player = state.player.copy(items = BlueKey.this :: state.player.items,
-                                            location = updatedJail),
-                 map = state.map.copy(jail = updatedJail))
+      (state.copy(player = state.player.copy(items = BlueKey.this :: state.player.items,
+                                             location = updatedJail),
+                  map = state.map.copy(jail = updatedJail)), "You pick up the Blue key, dust it off and put it in your pocket")
     }
 
     override def toString = "Take the key when nobody is looking."
@@ -38,7 +38,7 @@ case class BlueKey extends GameObject {
 }
 
 trait Action {
-  def update(state: GameState): GameState
+  def update(state: GameState): (GameState, String)
 }
 
 class ExitAction extends Action {
@@ -64,22 +64,23 @@ case class GameMap(jail: Site = new Site("Scalata jail", "Jail in Scalata.  This
 case class GameState(map: GameMap, player: Player) {
   def this(map: GameMap) = this (map, new Player("Dorbax", 0, map.townSquare, Nil))
 
+
   def update(input: Action) = input.update(this)
 
-  def options = {
+  def choices = {
     val travelLinks = for ( link <- map.links(player.location) ) yield {
       TravelTo(link)
     }
-    val itemOptions = for ( obj <- player.location.objects; action <- obj.getActions ) yield {
+    val itemChoices = for ( obj <- player.location.objects; action <- obj.actions ) yield {
       action
     }
-    val systemOptions = new ExitAction :: Nil
-    travelLinks ::: itemOptions.toList ::: systemOptions
+    val systemChoices = new ExitAction :: Nil
+    travelLinks ::: itemChoices.toList ::: systemChoices
   }
 
   override def toString = {
     player.name + ": " + player.gold + " gold, you have: " + player.items.map(_.getInventoryDescription).mkString(",") + "\n" +
-    player.location.name +"\n" +
+    player.location.name + "\n" +
     player.location.description + "\n" +
     player.location.objects.map(_.getSiteDescription).mkString("\n")
   }
@@ -88,20 +89,22 @@ case class GameState(map: GameMap, player: Player) {
 case class TravelTo(destination: Site) extends Action {
   override def toString = "Travel to " + destination.name
 
-  def update(state: GameState) = state.copy(player = state.player.copy(location = destination))
+  def update(state: GameState) = (state.copy(player = state.player.copy(location = destination)), "You travel to " + destination.name)
 }
 
 class ConsoleGame {
   def loopGame(state: GameState): Unit = {
     println(state)
-    val options = state.options
-    val numberedOptions = for ( i <- 0 until options.length ) yield {
-      i + ". " + options(i)
+    val choices = state.choices
+    val numberedChoices = for ( i <- 0 until choices.length ) yield {
+      i + ". " + choices(i)
     }
-    println(numberedOptions.mkString("\n"))
+    println(numberedChoices.mkString("\n"))
     val line: String = readLine()
     val choice = Integer.parseInt(line)
-    loopGame(state.update(options(choice)))
+    val result: (GameState, String) = state.update(choices(choice))
+    println(result._2)
+    loopGame(result._1)
   }
 }
 
