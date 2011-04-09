@@ -7,12 +7,6 @@ import swing.event._
 import swing.event.Key._
 import scala.swing.event.Key.Value
 
-case class Player(x: Int, y: Int)
-
-case class GameState(player: Player) {
-
-}
-
 object SwingGame extends SimpleSwingApplication {
   def top = new MainFrame {
     contents = new Component {
