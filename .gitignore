@@ -1,3 +1,8 @@
 lib_managed
 project/boot
 target
+.idea/
+project/plugins/project/
+project/plugins/src_managed/
+project/project.iml
+
