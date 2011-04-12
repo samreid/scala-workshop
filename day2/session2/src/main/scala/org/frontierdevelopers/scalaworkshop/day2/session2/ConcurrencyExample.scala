@@ -8,7 +8,7 @@ import akka.actor.Actors._;
  */
 
 object ConcurrencyExample {
-  def main(args: Array[String]) = {
+  def main(args: Array[String]) {
     println("hello")
 
     // server code
