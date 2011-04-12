@@ -31,3 +31,18 @@ object TestMain {
     println(new Game)
   }
 }
+
+object Grue{
+  val species = "Grue"
+  val strength = 456
+  val maxHealth = 200
+  val health = maxHealth
+  val attackDamage = 42000000
+  val friendly = false
+}
+
+object MyAwesomeGame{
+  def main(args: Array[String]) {
+    println(Grue)
+  }
+}
