@@ -1,7 +1,9 @@
 package org.frontierdevelopers.scalaworkshop.day2.session2
 
 import akka.actor.Actor
-import akka.actor.Actors._;
+import akka.actor.Actors._
+import akka.japi.Creator
+;
 
 /**
  * @author Sam Reid
@@ -33,8 +35,35 @@ object ConcurrencyExample {
 object Example2 {
   def main(args: Array[String]) {
     println("hello2")
-    val x = Map("sword"->123)
-    val y = x.toList.sortWith( _._2 < _._2 )
-    println("y = "+y)
+    val x = Map("sword" -> 123)
+    val y = x.toList.sortWith(_._2 < _._2)
+    println("y = " + y)
+  }
+}
+
+class MyActor extends Actor {
+  def receive = {
+    case x: String => {
+      println("received string: " + x)
+    }
+  }
+}
+
+object Example3 {
+  def main(args: Array[String]) {
+//    println("hello")
+//    val actor = actorOf(classOf[MyActor]);
+//    actor.start()
+//    actor.sendOneWay("hello")
+
+    val a2 = actorOf(new Creator[Actor] {
+      def create = new Actor() {
+        protected def receive = {
+          case x: String => println("received string: " + x)
+        }
+      }
+    })
+    a2.start()
+    a2.sendOneWay("hello there")
   }
 }
