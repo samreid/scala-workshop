@@ -51,19 +51,14 @@ class MyActor extends Actor {
 
 object Example3 {
   def main(args: Array[String]) {
-//    println("hello")
-//    val actor = actorOf(classOf[MyActor]);
-//    actor.start()
-//    actor.sendOneWay("hello")
-
-    val a2 = actorOf(new Creator[Actor] {
-      def create = new Actor() {
+    val actor = actorOf(new Creator[Actor] {
+      def create = new Actor {
         protected def receive = {
           case x: String => println("received string: " + x)
         }
       }
     })
-    a2.start()
-    a2.sendOneWay("hello there")
+    actor.start()
+    actor.sendOneWay("hello there, second time")
   }
 }
