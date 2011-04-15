@@ -1,0 +1,6 @@
+# IDEA files are generated with "sbt idea"
+*.iml
+
+boot/
+project/plugins/project/
+project/plugins/src_managed/
