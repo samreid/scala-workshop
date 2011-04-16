@@ -4,12 +4,14 @@
 
 package org.frontier
 
+import java.io.Serializable
+
 
 class Creature (val species : String,
                 val strength : Int = 10,
                 private var _health : Double = 50,
                 val attack : Double = 5,
-                val friendly : Boolean = false) {
+                val friendly : Boolean = false) extends Serializable{
   val maxHealth = _health
 
   def damage (amount : Double) : Unit = {
