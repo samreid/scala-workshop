@@ -9,7 +9,7 @@ import akka.japi.Creator
  * @author Sam Reid
  */
 
-object ConcurrencyExample {
+object RemoteActorExample {
   def main(args: Array[String]) {
     println("hello")
 
@@ -32,20 +32,19 @@ object ConcurrencyExample {
   }
 }
 
-object Example2 {
-  def main(args: Array[String]) {
-    println("hello2")
-    val x = Map("sword" -> 123)
-    val y = x.toList.sortWith(_._2 < _._2)
-    println("y = " + y)
+class ConsoleActor extends Actor {
+  def receive = {
+    case x: String => println("Console Actor received string: " + x)
   }
 }
 
-class MyActor extends Actor {
-  def receive = {
-    case x: String => {
-      println("received string: " + x)
-    }
+object Example1LocalActor {
+  def main(args: Array[String]) {
+    val actor = actorOf(classOf[ConsoleActor])
+    actor.start()
+    actor.sendOneWay("hello there")
+    actor.sendOneWay("hello again")
+    actor ! "hello using !"
   }
 }
 
@@ -54,7 +53,7 @@ object Example3 {
     val actor = actorOf(new Creator[Actor] {
       def create = new Actor {
         protected def receive = {
-          case 123 => self.reply_?("got your 123")
+          case 123 => self reply_? "got your 123"
           case x: String => println("received string: " + x)
         }
       }
