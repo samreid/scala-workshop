@@ -3,6 +3,7 @@ package org.frontierdevelopers.scalaworkshop.day2.session2
 import akka.actor.Actor
 import akka.actor.Actors._
 
+//Simple actor implementation with built-in-types
 class ConsoleActor extends Actor {
   def receive = {
     case x: String => println("Console Actor received string: " + x)
