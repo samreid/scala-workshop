@@ -23,7 +23,9 @@ case class Action(description : String, agent : String, message : Request)
 case class Prompt(message : String, choices : List[Action])
 case class Info(message : String)
 
+/* GameController messages */
 case class Join(name : String) extends Request
+case class Leave(name : String) extends Request
 
 class GameController extends Actor {
   private[this] var players = Map[String,Character]()
@@ -37,7 +39,13 @@ class GameController extends Actor {
       self.reply_?("That name is taken")
     } else {
       players += (player -> new Character("Human", player))
+      log.info("Player %s has joined".format(player))
       self.reply_?(Prompt("Not much to do now", defaultActions(player)))
+    }
+    case Leave(player) => {
+      players -= player
+      log.info("Player %s has left".format(player))
+      self.reply_?("OK")
     }
   }
 }
@@ -54,8 +62,8 @@ class InventoryController extends Actor {
   def receive = {
     case GetInventory(subject) => {
       self.reply_?(inventory(subject) match {
-        case Nil => "You aren't carrying anything"
-        case items => items.mkString("You're carrying: " , ", ", "")
+        case Nil => Info("You aren't carrying anything")
+        case items => Info(items.mkString("You're carrying: " , ", ", ""))
       })
     }
     case AddToInventory(subject, item) => {

@@ -50,14 +50,14 @@ object GameClient {
     println("x. Exit")
 
     readLine() match {
-      case "x" => println("Goodbye!"); shutdown(); // only here to make it tail-recursive
+      case "x" => println("Goodbye!"); game ! Leave(name); shutdown(); // only here to make it tail-recursive
       case pick => {
         try {
           val choice = prompt.choices(pick.toInt)
           (choice.agent !! choice.message) match {
             case Some(newPrompt : Prompt) => loopGame(name, newPrompt)
             case Some(Info(message)) => println(message)
-            case _ => println("Invalid response from server, try again")
+            case other => println("Invalid response from server, try again")
           }
         } catch {
           case ex if ex.isInstanceOf[NumberFormatException] || ex.isInstanceOf[IndexOutOfBoundsException] => {
