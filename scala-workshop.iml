@@ -14,6 +14,7 @@
       <sourceFolder url="file://$MODULE_DIR$/day1/session1/src/main/scala" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/day2/session2/src/main/scala" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/sandbox/LearnScala/src/main/scala" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/day2/session3/3-scala-gui/src/main/scala" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
