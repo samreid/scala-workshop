@@ -1,4 +1,4 @@
-package org.frontierdevelopers.scalaworkshop.swing
+package org.frontierdevelopers.scalaworkshop.gui
 
 import java.awt.{Dimension, Graphics2D}
 
@@ -7,19 +7,15 @@ import swing.event._
 import swing.event.Key._
 import scala.swing.event.Key.Value
 
-case class Player(x: Int, y: Int)
-
-case class GameState(player: Player) {
-
-}
-
 object SwingGame extends SimpleSwingApplication {
   def top = new MainFrame {
     contents = new Component {
       private var x = 100
       private var y = 100
 
-      override protected def paintComponent(g: Graphics2D) = g.drawString("*o*", x, y)
+      override protected def paintComponent(g: Graphics2D) {
+        g.drawString("*o*", x, y)
+      }
 
       preferredSize = new Dimension(800, 600)
       focusable = true
@@ -28,7 +24,7 @@ object SwingGame extends SimpleSwingApplication {
         case KeyPressed(_, key, _, _) => handleKeyPress(key)
       }
 
-      def handleKeyPress(key: Value) = {
+      def handleKeyPress(key: Value) {
         key match {
           case Left => x = x - 10
           case Right => x = x + 10
