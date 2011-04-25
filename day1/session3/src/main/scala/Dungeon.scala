@@ -71,18 +71,24 @@ object DungeonMap {
   )
 
   def generate(locations: List[Location]): DungeonMap = {
+    // Randomly generate a pair of directions that will be used for the "to" and "from"
+    // instructions to get between two locations.
     def dirs = {
-      val result = if (Random.nextBoolean) ("East", "West") else ("North", "South") 
-      if (Random.nextBoolean) result.swap else result
+      val pair = if (Random.nextBoolean) ("East", "West") else ("North", "South") 
+      if (Random.nextBoolean) pair.swap else pair
     }
-
-    def addExits(l1: Location, l2: Location, locs: Map[Location, Set[Exit]]) = {
+      
+    // add exits between a pair of locations to the map
+    def addExits(a: Location, b: Location, locs: Map[Location, Set[Exit]]) = {
       val (from, to) = dirs
-      Map(l1 -> Exit(l2, "Go " + from), l2 -> Exit(l1, "Go " + to)).foldLeft(locs) {
+      Map(a -> Exit(b, "Go " + from), b -> Exit(a, "Go " + to)).foldLeft(locs) {
         case (m, (l, e)) => m + (l -> (m.getOrElse(l, Set()) + e))
       }
     }
-
+    
+    // Randomly arrange the locations, then using a sliding window 4 elements wide,
+    // add mutual entrances and exits between locations. The topology will likely end
+    // up pretty funky, but that's okay.
     new DungeonMap(
       Random.shuffle(locations).sliding(4).foldLeft(Map.empty[Location, Set[Exit]]) {
         case (m, List(a, b, c, d)) => addExits(a, b, addExits(a, c, addExits(a, d, m)))
