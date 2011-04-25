@@ -84,7 +84,7 @@ object DungeonMap {
     }
 
     new DungeonMap(
-      Random.shuffle(locations).sliding(3).foldLeft(Map.empty[Location, Set[Exit]]) {
+      Random.shuffle(locations).sliding(4).foldLeft(Map.empty[Location, Set[Exit]]) {
         case (m, List(a, b, c, d)) => addExits(a, b, addExits(a, c, addExits(a, d, m)))
       }
     )
