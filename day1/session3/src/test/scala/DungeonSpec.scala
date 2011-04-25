@@ -18,15 +18,14 @@ class MapSpec extends Specification with ScalaCheck {
   import Gen._
   import Arbitrary.arbitrary
   implicit val arbLoc  = Arbitrary(for (name <- alphaStr suchThat (_.size > 3)) yield Location(name, Nil, Abandoned))
-  case class ProtoMap(l: List[Location])
-  implicit val arbLocs = Arbitrary(for (n <- choose(10, 50); locs <- Gen.listOfN(n, arbitrary[Location])) yield ProtoMap(locs))
+  implicit val arbLocs = Arbitrary(for (n <- choose(10, 50); locs <- Gen.listOfN(n, arbitrary[Location])) yield locs)
 
   "a randomly generated map" should {
     "be fully connected" in {
       val prop = Prop.forAll(
-        (m: ProtoMap) => {
-          val map = DungeonMap.generate(m.l)
-          m.l.forall(
+        (l: List[Location]) => {
+          val map = DungeonMap.generate(l)
+          l.forall(
             loc => map.exits(loc) must exist {
               case Exit(to, _) => map.exits(to) must exist {
                 case Exit(from, _) => from == loc
