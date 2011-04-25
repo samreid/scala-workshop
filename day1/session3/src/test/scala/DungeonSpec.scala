@@ -19,11 +19,12 @@ class MapSpec extends Specification with ScalaCheck {
     "be fully connected" in {
       import Gen._
       import Arbitrary.arbitrary
-      implicit val arbLoc  = Arbitrary(for (name <- arbitrary[String] suchThat (_.length > 3)) yield Location(name, Nil, Abandoned))
-      implicit val arbLocs = Arbitrary(for (n <- choose(5, 50); locs <- Gen.listOfN(n, arbitrary[Location])) yield locs)
+      implicit val arbLoc  = Arbitrary(for (name <- alphaStr suchThat (_.size > 3)) yield Location(name, Nil, Abandoned))
+      //implicit val arbLocs = Arbitrary(for (n <- choose(5, 50); locs <- Gen.listOfN(n, arbitrary[Location]) suchThat (_.size >= 5)) yield locs)
 
       val prop = Prop.forAll(
         (l: List[Location]) => {
+          println(l.mkString("Running list:\n  ", "\n  ","\n\n\n"))
           val map = DungeonMap.generate(l)
           l.forall(
             loc => map.exits(loc) must exist {
