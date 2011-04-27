@@ -12,12 +12,16 @@ object Example4_Events extends SimpleSwingApplication {
       contents += slider
       val textField = new TextField {text = "a text field"}
       contents += textField
-      listenTo(button)
-      listenTo(slider)
-      reactions += {
-        case ButtonClicked(b) => textField.text = "Button pressed!"
-        case ValueChanged(s: Slider) => textField.text = "Slider value: " + s.value
-      }
+      attachListeners(button, slider, textField)
+    }
+  }
+
+  def attachListeners(button: Button, slider: Slider, textField: TextField) {
+    listenTo(button)
+    listenTo(slider)
+    reactions += {
+      case ButtonClicked(b) => textField.text = "Button pressed!"
+      case ValueChanged(s: Slider) => textField.text = "Slider value: " + s.value
     }
   }
 }
