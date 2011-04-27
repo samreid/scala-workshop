@@ -1,8 +1,7 @@
-lib_managed
-project/boot
-target
+boot/
+lib_managed/
+src_managed/
+target/
 .idea/
-project/plugins/project/
-project/plugins/src_managed/
-project/project.iml
+project.iml
 
