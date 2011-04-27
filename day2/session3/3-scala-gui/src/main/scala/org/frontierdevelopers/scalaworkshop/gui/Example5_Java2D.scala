@@ -7,7 +7,7 @@ import swing.event._
 import swing.event.Key._
 import scala.swing.event.Key.Value
 
-object SwingGame extends SimpleSwingApplication {
+object Example5_Java2D extends SimpleSwingApplication {
   def top = new MainFrame {
     contents = new Component {
       private var x = 100
