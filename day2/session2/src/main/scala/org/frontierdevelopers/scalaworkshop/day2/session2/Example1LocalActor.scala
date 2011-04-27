@@ -1,7 +1,6 @@
 package org.frontierdevelopers.scalaworkshop.day2.session2
 
 import akka.actor.Actor
-import akka.actor.Actors._
 
 //Simple actor implementation with built-in-types
 class ConsoleActor extends Actor {
@@ -11,11 +10,13 @@ class ConsoleActor extends Actor {
   }
 }
 
-object Example1LocalActor {
+import akka.actor.Actors._
+object SendConsoleActor {
   def main(args: Array[String]) {
     val actor = actorOf(classOf[ConsoleActor])
     actor.start()
-    actor ! "Why hello there!"
+    actor.sendOneWay("Why hello there!")
     actor ! 123
+    actor ! "Bye!"
   }
 }
