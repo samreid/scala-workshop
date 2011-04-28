@@ -11,7 +11,7 @@ class ClientInput extends Actor {
 
   def receive = {
     case Prompt(message, choices) => {
-      println(message)
+      println("\n" + message)
 
       val choice = readChoice(choices)
       choice.agent ! ClientChoice(name, choice.action)
@@ -21,11 +21,13 @@ class ClientInput extends Actor {
 
   @tailrec
   final def readChoice(choices : List[Choice]) : Choice = {
-    println("You may:\n")
+    println("\nYou may:\n")
 
     choices.zipWithIndex.foreach {
       case (choice : Choice,index : Int) => println((index +1) + ". " + choice.description)
     }
+
+    print("\nChoice: ")
 
     try {
       return choices(readLine().toInt - 1)

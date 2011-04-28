@@ -9,9 +9,9 @@ import annotation.tailrec
 
 object GameClient {
   def main (args : Array[String]) {
-    val game = Actors.actorOf(classOf[GameActor]).start
-    val input = Actors.actorOf(classOf[ClientInput]).start
-    val display = Actors.actorOf(classOf[ClientDisplay]).start
+    val game = Actors.actorOf(classOf[GameActor]).start()
+    val input = Actors.actorOf(classOf[ClientInput]).start()
+    val display = Actors.actorOf(classOf[ClientDisplay]).start()
 
     println("What is your name?")
 
@@ -21,7 +21,7 @@ object GameClient {
   @tailrec
   def joinGame (game : ActorRef, input : ActorRef, display : ActorRef, name : String) {
     game !! Join(name, input, display) match {
-      case Some(p : Prompt) => println("Joined!"); input ! name; input ! p
+      case Some(p : Prompt) => input ! name; input ! p
       case None => {
         println("Time out joining game!")
         joinGame(game, input, display, name)
