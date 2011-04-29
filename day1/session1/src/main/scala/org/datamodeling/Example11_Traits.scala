@@ -1,6 +1,6 @@
 package org.datamodeling
 
-trait Item {
+trait MyItem {
   val name: String
   val weight = 1
 }
@@ -8,7 +8,7 @@ trait Item {
 object Example11_Traits {
   def main(args: Array[String]) {
 
-    object sword extends Item {
+    object sword extends MyItem {
       val name = "sword of wonder"
     }
     println(sword.name)
