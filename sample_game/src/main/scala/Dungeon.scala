@@ -48,6 +48,7 @@ object LootTheLand extends Dungeon {
       }
 
       currentChoices(readLine.toInt) match {
+        case QuitChoice => Finished
         case PathChoice(path) => Running(player, path.loc, loot)
         case PickUpChoice(item) => Running(
           player.copy(inventory = item +: player.inventory),
@@ -68,12 +69,12 @@ object LootTheLand extends Dungeon {
 
   private def describeLoot(items: List[Item]) = items match {
     case Nil => "There's nothing here"
-    case i :: Nil => "You see a " + i + " lying on the ground."
-    case xs => "You see " + xs.init.mkString(", ") + " and a " + xs.last + " lying on the ground."
+    case i :: Nil => "You see a " + i.name + " lying on the ground."
+    case xs => "You see " + xs.init.map(_.name).mkString(", ") + " and a " + xs.last.name + " lying on the ground."
   }
 
   private def choices(loc: Location, loot: List[Item]) = {
-    (loot.map(PickUpChoice) ++ map.paths(loc).map(PathChoice)).toList
+    QuitChoice :: (loot.map(PickUpChoice) ++ map.paths(loc).map(PathChoice)).toList
   }
 
   private def removeItem(loc: Location, item: Item, loot: Map[Location, List[Item]]) = {
@@ -87,6 +88,11 @@ object LootTheLand extends Dungeon {
 sealed trait Choice {
   def description: String
 }
+
+case object QuitChoice extends Choice {
+  def description = "Quit"
+}
+
 case class PathChoice(path: Path) extends Choice {
   def description = "Go " + path.direction
 }
