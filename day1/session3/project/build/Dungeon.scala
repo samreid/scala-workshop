@@ -1,7 +1,7 @@
 import sbt._
 
-class Dungeon(info: ProjectInfo) extends DefaultProject(info) {
-  override def mainClass = Some("dung.eon.Main")
+class Dungeon(info: ProjectInfo) extends DefaultProject(info) with IdeaProject {
+  override def mainClass = Some("dungeon.LootTheLand")
   val specs = "org.scala-tools.testing" %% "specs" % "1.6.7.2" % "test"
   val check = "org.scala-tools.testing" %% "scalacheck" % "1.8" % "test"
 }

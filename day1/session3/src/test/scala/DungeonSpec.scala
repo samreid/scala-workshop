@@ -1,4 +1,4 @@
-package dung.eon
+package dungeon
 
 import org.specs._
 import org.scalacheck._
@@ -31,9 +31,9 @@ class MapSpec extends Specification with ScalaCheck {
         (l: List[Location]) => {
           val map = DungeonMap.generate(l)
           l.forall(
-            loc => map.exits(loc) must exist {
-              case Exit(to, _) => map.exits(to) must exist {
-                case Exit(from, _) => from == loc
+            loc => map.paths(loc) must exist {
+              case dungeon.Path(to, _) => map.paths(to) must exist {
+                case dungeon.Path(from, _) => from == loc
               }
             }
           )
