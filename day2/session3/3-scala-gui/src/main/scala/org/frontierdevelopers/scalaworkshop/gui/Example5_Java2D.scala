@@ -1,11 +1,10 @@
 package org.frontierdevelopers.scalaworkshop.gui
 
-import java.awt.{Dimension, Graphics2D}
-
 import scala.swing.{Component, MainFrame, SimpleSwingApplication}
 import swing.event._
 import swing.event.Key._
 import scala.swing.event.Key.Value
+import java.awt.{Font, Dimension, Graphics2D}
 
 object Example5_Java2D extends SimpleSwingApplication {
   def top = new MainFrame {
@@ -14,7 +13,8 @@ object Example5_Java2D extends SimpleSwingApplication {
       private var y = 100
 
       override protected def paintComponent(g: Graphics2D) {
-        g.drawString("*o*", x, y)
+        g.setFont(new Font("Lucida Sans",Font.BOLD,60))
+        g.drawString("X", x, y)
       }
 
       preferredSize = new Dimension(800, 600)
