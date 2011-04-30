@@ -18,11 +18,10 @@ class GameDisplay extends CometActor {
   bridge ! this
 
   // A place to store the current state
-  object currentStateVar extends
+  object currentState extends
     SessionVar[Box[State]](Empty)
-  def currentState = currentStateVar.is
 
-  def render = currentState match {
+  def render = currentState.is match {
     case Empty => {
       // We need to prompt the player for their name in order to join
       SHtml.ajaxForm(
@@ -44,7 +43,7 @@ class GameDisplay extends CometActor {
   }
 
   def perform (choice : Choice) : JsCmd = {
-    currentState.foreach {
+    currentState.is.foreach {
       state =>
         choice.action match {
           case d : Display => choice.agent ! d
@@ -61,12 +60,12 @@ class GameDisplay extends CometActor {
 
   override def mediumPriority = {
     case Display(message) => currentState.foreach {
-      state => currentStateVar(Full(state.copy(messages = message :: state.messages)))
+      state => currentState.set(Full(state.copy(messages = message :: state.messages)))
       partialUpdate(updateMessages())
     }
     case Prompt(message, choices) => currentState.foreach {
-      state => currentStateVar(Full(state.copy(messages = message :: state.messages,
-                                               choices = choices)))
+      state => currentState.set(Full(state.copy(messages = message :: state.messages,
+                                            choices = choices)))
       partialUpdate(updateMessages() & updateChoices())
     }
   }
@@ -74,20 +73,20 @@ class GameDisplay extends CometActor {
   def login (name : String) {
     Controller.game !! Join(name, bridge, bridge) match {
       case Some(Prompt(message,choices)) => 
-        currentStateVar(Full(State(name,message :: Nil,choices)))
+        currentState.set(Full(State(name,message :: Nil,choices)))
         reRender()
       case other => error("Error: " + other)
     }
   }
 
   def updateMessages() : JsCmd = {
-    currentState.map {
+    currentState.is.map {
       state => JsCmds.SetHtml("status", state.messages.reverse.flatMap{Text(_) ++ <br/>})
     } openOr JsCmds.Noop
   }
 
   def updateChoices() : JsCmd = {
-    currentState.map {
+    currentState.is.map {
       state => JsCmds.SetHtml("choices",
         ("#choices ^^" #> "ignore" &
          ".choice" #> (
