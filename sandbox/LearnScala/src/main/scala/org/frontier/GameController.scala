@@ -11,11 +11,12 @@ object Controllers {
   val game = actorOf[GameController]
   val inventory = actorOf[InventoryController]
 
-  remote.register("game", game)
-  remote.register("inventory", inventory)
-
   val gameAgent = "game"
   val inventoryAgent = "inventory"
+
+  val registry = Map(gameAgent -> game, inventoryAgent -> inventory)
+
+  registry.foreach{case (name,actor) => remote.register(name, actor)}
 }
 
 sealed trait Request
@@ -36,7 +37,7 @@ class GameController extends Actor {
 
   def receive = {
     case Join(player) => if (players.contains(player)) {
-      self.reply_?("That name is taken")
+      self.reply_?(Info("That name is taken"))
     } else {
       players += (player -> new Character("Human", player))
       log.info("Player %s has joined".format(player))
@@ -45,7 +46,7 @@ class GameController extends Actor {
     case Leave(player) => {
       players -= player
       log.info("Player %s has left".format(player))
-      self.reply_?("OK")
+      self.reply_?(Info("OK"))
     }
   }
 }

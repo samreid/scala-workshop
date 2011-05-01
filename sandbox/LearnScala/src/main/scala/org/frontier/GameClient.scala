@@ -8,7 +8,6 @@ import annotation.tailrec
 import akka.actor.{ScalaActorRef, Actor, ActorRef}
 import Actor._
 
-
 object GameClient {
   def main (args : Array[String]) {
     remote.start()
