@@ -30,11 +30,11 @@ class GameDisplay extends CometActor {
         <input type="submit" value="Log in" />
       )
     }
-    case Full(state @ State(name, messages, choices)) => {
+    case Full(State(name, messages, choices)) => {
       "#name" #> name &
       "#status *" #> messages.reverse.map{Text(_) ++ <br/>} &
       ".choice" #> (
-        choices.flatMap {
+        choices.flatMap { // Transform each choice into a link with a description
           case choice =>
             SHtml.a(() => perform(choice), <li>{choice.description}</li>)
         }
@@ -46,6 +46,7 @@ class GameDisplay extends CometActor {
     currentState.is.foreach {
       state =>
         choice.action match {
+          // Special handling for messages 
           case d : Display => choice.agent ! d
           case otherMessage => {
             choice.agent !! ClientChoice(state.name, choice.action) match {

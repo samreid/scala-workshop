@@ -8,9 +8,6 @@ class LiftProject(info: ProjectInfo) extends DefaultWebProject(info) {
   val guiceyfruit_repo = "GuiceyFruit repo" at "http://guiceyfruit.googlecode.com/svn/repo/releases/"
 
   val akka = "se.scalablesolutions.akka" % "akka-actor" % "1.0"
-  val akkaRemote = "se.scalablesolutions.akka" % "akka-remote" % "1.0"
-
-  val gameCode = "org.fdgame" %% "workshop-d2s2" % "1.0"
 
   // uncomment the following if you want to use the snapshot repo
   //  val scalatoolsSnapshot = ScalaToolsSnapshots
