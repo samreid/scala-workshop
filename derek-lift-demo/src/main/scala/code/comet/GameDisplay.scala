@@ -22,6 +22,11 @@ class GameDisplay extends CometActor {
   private val bridge = Actors.actorOf(classOf[BridgeActor]).start()
   bridge ! this
 
+  // Make sure to stop our BridgeActor when we clean up Comet
+  override protected def localShutdown() {
+    bridge.stop()
+  }
+
   /* A SessionVar represents a variable held by the
    * servlet Session. It provides some nice wrapper functionality,
    * including a default value and some transform/set operations.
